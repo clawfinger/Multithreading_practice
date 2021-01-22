@@ -9,10 +9,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(HEADERS
     SimpleThreadsafeQueue.h
+    SimpleThreadPool.h
     )
 
 set(SOURCES
     main.cpp
-    SimpleThreadsafeQueue.cpp)
+    SimpleThreadsafeQueue.cpp
+    SimpleThreadPool.cpp
+    )
 
 add_executable(${PROJECT} ${SOURCES} ${HEADERS})

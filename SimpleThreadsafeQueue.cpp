@@ -1,7 +1,7 @@
 #include "SimpleThreadsafeQueue.h"
 
 template<typename T>
-void ThreadSafeQueue<T>::push(T value)
+void SimpleThreadSafeQueue<T>::push(T value)
 {
     std::lock_guard<std::mutex> lk(m);
     m_queue.push(value);
@@ -9,14 +9,14 @@ void ThreadSafeQueue<T>::push(T value)
 }
 
 template<typename T>
-bool ThreadSafeQueue<T>::empty() const
+bool SimpleThreadSafeQueue<T>::empty() const
 {
     std::lock_guard<std::mutex> lk(m);
     return m_queue.empty();
 }
 
 template<typename T>
-bool ThreadSafeQueue<T>::tryPop(T& value)
+bool SimpleThreadSafeQueue<T>::tryPop(T& value)
 {
     std::lock_guard<std::mutex> lk(m);
 
@@ -29,7 +29,7 @@ bool ThreadSafeQueue<T>::tryPop(T& value)
 }
 
 template<typename T>
-void ThreadSafeQueue<T>::waitPop(T& value)
+void SimpleThreadSafeQueue<T>::waitPop(T& value)
 {
     std::unique_lock<std::mutex> ulk(m);
     m_condition.wait(ulk, [this](){return !m_queue.empty();});

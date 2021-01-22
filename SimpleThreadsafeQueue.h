@@ -4,12 +4,12 @@
 #include <condition_variable>
 
 template <typename T>
-class ThreadSafeQueue
+class SimpleThreadSafeQueue
 {
 public:
-    ThreadSafeQueue() = default;
-    ThreadSafeQueue(const ThreadSafeQueue& other) = delete;
-    ThreadSafeQueue& operator=(const ThreadSafeQueue& other) = delete;
+    SimpleThreadSafeQueue() = default;
+    SimpleThreadSafeQueue(const SimpleThreadSafeQueue& other) = delete;
+    SimpleThreadSafeQueue& operator=(const SimpleThreadSafeQueue& other) = delete;
     void push(T value);
     bool empty() const;
 
