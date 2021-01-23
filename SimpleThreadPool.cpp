@@ -14,13 +14,16 @@ ThreadPoolJoinGuard::~ThreadPoolJoinGuard()
 
 SimpleThreadPool::SimpleThreadPool(unsigned int threadCount): m_joinGuard(m_threads)
 {
-    //    for (unsigned int i = 0; i < threadCount; ++i)
+    for (unsigned int i = 0; i < threadCount; ++i)
+        m_threads.push_back(std::thread(&SimpleThreadPool::threadWorker, this));
 }
 
 void SimpleThreadPool::threadWorker()
 {
     while(true) //TODO: add stop flag;
     {
-        m_queue.waitPop()
+       MovableCallableWrapper threadTask;
+        m_queue.waitPop(threadTask);
+        threadTask();
     }
 }
