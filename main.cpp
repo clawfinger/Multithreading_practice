@@ -2,13 +2,6 @@
 #include <iostream>
 #include <mutex>
 
-long long heavyTask(int number)
-{
-    if (number == 0)
-        return 1;
-    return number * heavyTask(number - 1);
-}
-
 class ThreadSafeConsole
 {
 public:
@@ -33,6 +26,18 @@ private:
     std::mutex m;
 };
 
+long long heavyTaskRec(int number)
+{
+    if (number == 0)
+        return 1;
+    return number * heavyTaskRec(number - 1);
+}
+
+long long heavyTask(ThreadSafeConsole& console, int number)
+{
+    console << heavyTaskRec(number) << std::endl; //race condition in between 2 operator<<
+}
+
 template <class callable, class... arguments>
 void later(int after, callable&& f, arguments&&... args)
 {
@@ -46,16 +51,12 @@ void later(int after, callable&& f, arguments&&... args)
 
 int main()
 {
-//    std::queue<std::packaged_task<void()>> queue;
-//    auto boundFunc = std::bind(heavyTask, 10);
-//    std::packaged_task<long long()> task(boundFunc);
-//    std::future<long long> future = task.get_future();
-//    queue.push(std::packaged_task<void()>(std::move(task)));
-//    std::packaged_task<void()> task1 = std::move(queue.front());
-
+    ThreadSafeConsole console;
     SimpleThreadPool pool;
-    std::future<long long> future = pool.submitTask(heavyTask, 4);
-    long long res = future.get();
+    pool.submitTask(heavyTask, std::ref(console), 20);
+    pool.submitTask(heavyTask, std::ref(console), 20);
+    pool.submitTask(heavyTask, std::ref(console), 20);
+    std::this_thread::sleep_for(std::chrono::seconds(5));
     return 0;
 }
 

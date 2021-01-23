@@ -4,6 +4,7 @@
 #include <future>
 #include <functional>
 #include <type_traits>
+#include <atomic>
 
 #include "SimpleThreadsafeQueue.h"
 
@@ -60,12 +61,12 @@ class SimpleThreadPool
 {
 public:
     SimpleThreadPool(unsigned int threadCount = std::thread::hardware_concurrency());
-
+    ~SimpleThreadPool();
     template<typename Callable, typename... Args>
     decltype(auto) submitTask(Callable&& func, Args&&... args)
     {
         typedef typename std::result_of<Callable(Args...)>::type returnType;
-        auto boundFunc = std::bind(std::forward<Callable>(func), std::forward<Args...>(args...));
+        auto boundFunc = std::bind(func, args...);
         std::packaged_task<returnType()> task(boundFunc);
         std::future<returnType> future = task.get_future();
         m_queue.push(std::move(task));
@@ -76,6 +77,7 @@ private:
     void threadWorker();
 
 private:
+    std::atomic_bool m_stop;
     SimpleThreadSafeQueue<MovableCallableWrapper> m_queue;
     std::vector<std::thread> m_threads;
     ThreadPoolJoinGuard m_joinGuard; //Member order is important! joinGuard should be destroyed before threads
